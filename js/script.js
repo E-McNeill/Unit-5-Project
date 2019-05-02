@@ -4,11 +4,15 @@ fetch('https://randomuser.me/api/?results=12&nat=us&inc=picture,name,email,locat
 .then(response => response.json())
 .then(data => generateUserData(data))
 
+let selectedCard ;
+
 
 /*Search Container*/
 $('.search-container').append('<form action="#" method="get"></form>');
 $('form').append('<input type="search" id="search-input" class="search-input" placeholder="Search...">');
 $('#search-input').after('<input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">');
+
+
 
 /*Gallery*/
 function generateUserData(data){
@@ -24,27 +28,57 @@ function generateUserData(data){
         $('.card-info-container:eq('+i+')').append(`<p class='hidden-info'>${data.results[i].cell}</p>`)
         .append(`<p class='hidden-info'>${data.results[i].location.street}, ${data.results[i].location.state}, ${data.results[i].location.postcode}</p>`)
         .append(`<p class='hidden-info'>${data.results[i].dob.date}</p>`);          
-         }
-        
-        /*Pulls the specific card's info out when clicked*/
-        $('.card').click(function(){
-            const employeePic = $(this).find('.card-img').attr('src');
-            const employeeName = $(this).find('#name').text(); //name
-            const employeeEmail = $(this).find('.card-text').eq(0).text(); //email
-            const employeeCity = $(this).find('.card-text.cap').text(); //location
-            const employeeCell = $(this).find('.hidden-info').eq(0).text(); //cell
-            const employeeAddress = $(this).find('.hidden-info').eq(1).text(); //address
-            const dateLongVersion = new Date($(this).find('.hidden-info').eq(2).text()); //dob
-            const month = dateLongVersion.getMonth() + 1;
-            const date = dateLongVersion.getDate();
-            const year = dateLongVersion.getFullYear().toString().slice(2);   
+     
 
-        /*Modal*/
-        /*Populates the modal with the clicked card's information*/ 
-        $('#gallery').after('<div class="modal-container"></div>');
-        $('.modal-container').append('<div class="modal"></div>');
-        $('.modal').append('<button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>');
-        $('.modal').append('<div class="modal-info-container"></div>');
+    }
+    /*Pulls the specific card's info out when clicked*/
+    $('.card').click(function () {
+        let selectedCard = $(this).index();
+        cardInfo(selectedCard)
+               });
+       
+
+   
+}
+/*Modal*/
+   
+  
+//   $('#gallery').after('<div class="modal-container"></div>');
+//   $('.modal-container').append('<div class="modal"></div>');
+//   $('.modal').append('<button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>');
+//   $('.modal').append('<div class="modal-info-container"></div>');
+//   /*Creates Prev and Next Buttons*/
+//   $('.modal-container').append('<div class="modal-btn-container">');
+//   $('.modal-btn-container').append('<button type="button" id="modal-prev" class="modal-prev btn">Prev</button>')
+//   .append('<button type="button" id="modal-next" class="modal-next btn">Next</button>');
+//   $('.modal-container').hide();
+  
+
+    /*Function to Populate the modal*/
+            function cardInfo(selectedCard){
+                const employeePic = $('.card').eq(selectedCard).find('.card-img').attr('src');
+                let employeeName = $('.card').eq(selectedCard).find('#name').text(); //name
+                const employeeEmail = $('.card').eq(selectedCard).find('.card-text').eq(0).text(); //email
+                const employeeCity = $('.card').eq(selectedCard).find('.card-text.cap').text(); //location
+                const employeeCell = $('.card').eq(selectedCard).find('.hidden-info').eq(0).text(); //cell
+                const employeeAddress = $('.card').eq(selectedCard).find('.hidden-info').eq(1).text(); //address
+                const dateLongVersion = new Date($('.card').eq(selectedCard).find('.hidden-info').eq(2).text()); //dob
+                const month = dateLongVersion.getMonth() + 1;
+                const date = dateLongVersion.getDate();
+                const year = dateLongVersion.getFullYear().toString().slice(2);  
+                console.log(selectedCard)
+
+                /*Creates the Modal*/
+                $('#gallery').after('<div class="modal-container"></div>');
+                $('.modal-container').append('<div class="modal"></div>');
+                $('.modal').append('<button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>');
+                $('.modal').append('<div class="modal-info-container"></div>');
+                /*Creates Prev and Next Buttons*/
+                $('.modal-container').append('<div class="modal-btn-container">');
+                $('.modal-btn-container').append('<button type="button" id="modal-prev" class="modal-prev btn">Prev</button>')
+                .append('<button type="button" id="modal-next" class="modal-next btn">Next</button>');
+                $('.modal-container').hide();
+/*Populates the Modal*/
         $('.modal-info-container').append(`<img class="modal-img" src="${employeePic}" alt="profile picture">`);
         $('.modal-img').after(`<h3 id="name" class="modal-name cap">${employeeName}</h3>`);
         $('.modal-name').after(`<p class="modal-text">${employeeEmail}</p>`);
@@ -53,30 +87,66 @@ function generateUserData(data){
         $('hr').after(`<p class="modal-text">Birthday: ${month}/${date}/${year}</p>`)
         .after(`<p class="modal-text cap">${employeeAddress}</p>`)
         .after(`<p class="modal-text cap">${employeeCell}</p>`);
-    
-        /*Modal goes away when the 'x' is clicked*/
-        $('.modal-close-btn').click(function(){
-            $('.modal-container').hide();
-            console.log('hi');
-        });
-    
-    });
+        /*Modal pops up when card is clicked*/
+        $('.modal-container').show();
+        /*Modal goes away when 'x' is clicked*/  
+        $('.modal-close-btn').click(function () {
+            $('.modal-container').remove();
+                                });
+       
+
+        $('.modal-prev').click(function(){
+            $('.modal-container').remove();
+            selectedCard =  selectedCard -1;
+            if (selectedCard === -1){
+                selectedCard = 11
+                cardInfo(selectedCard)
+            } else if (selectedCard === 12){
+                selectedCard = 0
+                cardInfo(selectedCard)
+            } else{
+            cardInfo(selectedCard)
+            }
+            
+            
+                        }); 
+
+            $('.modal-next').click(function(){
+                $('.modal-container').remove();
+                selectedCard =  selectedCard +1;
+                if (selectedCard === -1){
+                    selectedCard = 11
+                    cardInfo(selectedCard)
+                } else if (selectedCard === 12){
+                    selectedCard = 0
+                    cardInfo(selectedCard)
+                } else{
+                cardInfo(selectedCard)
+                }
+                
+                
+                            }); 
+
+
+    };
+
+  
+
+   
+
+          
 
         
-};
+    
+    
+   
+  
 
-/*Modal pops up when a card is clicked*/
-$('div.card').click(function(){
-    $('.modal-container').show();
-});
 
 
 
 /*Exceeds Portion*/
 
-$('.modal-container').after('<div class="modal-btn-container">');
-$('.modal-btn-container').append('<button type="button" id="modal-prev" class="modal-prev btn">Prev</button>')
-.append('<button type="button" id="modal-next" class="modal-next btn">Next</button>');
 
 
 
